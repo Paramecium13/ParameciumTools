@@ -32,14 +32,14 @@ namespace ParameciumTools
 		}
 
 		/// <summary>
-		/// 
+		/// Substitutes all items in 'toReplace' with 'replacement'.
 		/// </summary>
 		/// <typeparam name="T">The type of the list, must implement IEquatable T </typeparam>
 		/// <param name="list">The list.</param>
 		/// <param name="toReplace">A collection of the elements to replace.</param>
 		/// <param name="replacement">The element to replace with.</param>
 		/// <returns></returns>
-		public static List<T> SubstituteAll<T>(this List<T> list, IEnumerable<T> toReplace, T replacement)
+		public static List<T> Substitute<T>(this List<T> list, IEnumerable<T> toReplace, T replacement)
 		{
 			List<T> NewIEnum = new List<T>(list.Count());
 			foreach (var item in list)
