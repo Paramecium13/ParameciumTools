@@ -15,7 +15,7 @@ namespace ParameciumTools
 		/// <summary>
 		/// Substitutes all instances of one element with another element.
 		/// </summary>
-		/// <typeparam name="T">The type of the list, must implement IEquatable T </typeparam>
+		/// <typeparam name="T">The type of the list, must implement IEquatable T .</typeparam>
 		/// <param name="list">The list.</param>
 		/// <param name="toReplace">The element to replace.</param>
 		/// <param name="replacement">The element to replace with.</param>
@@ -34,7 +34,7 @@ namespace ParameciumTools
 		/// <summary>
 		/// Substitutes all items in 'toReplace' with 'replacement'.
 		/// </summary>
-		/// <typeparam name="T">The type of the list, must implement IEquatable T </typeparam>
+		/// <typeparam name="T">The type of the list's elements.</typeparam>
 		/// <param name="list">The list.</param>
 		/// <param name="toReplace">A collection of the elements to replace.</param>
 		/// <param name="replacement">The element to replace with.</param>
@@ -45,6 +45,23 @@ namespace ParameciumTools
 			foreach (var item in list)
 			{
 				NewIEnum.Add(toReplace.Contains(item) ? replacement : item);
+			}
+			return NewIEnum;
+		}
+
+		/// <summary>
+		/// Replaces all instances of the keys in the provided list with their associated values.
+		/// </summary>
+		/// <typeparam name="T">The type of the list's elements.</typeparam>
+		/// <param name="list">The list.</param>
+		/// <param name="substitutions">The dictionary of substitutions.</param>
+		/// <returns></returns>
+		public static List<T> Substitute<T>(this List<T> list, Dictionary<T,T> substitutions)
+		{
+			List<T> NewIEnum = new List<T>(list.Count());
+			foreach (var item in list)
+			{
+				NewIEnum.Add(substitutions.ContainsKey(item) ? substitutions[item] : item);
 			}
 			return NewIEnum;
 		}
