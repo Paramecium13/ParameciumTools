@@ -40,6 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\Delegates.cs" />
+    <Compile Include="Events\EventRouter.cs" />
+    <Compile Include="Events\NotifyOnOpenEvent.cs" />
+    <Compile Include="Events\RespondableEvent.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
