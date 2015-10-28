@@ -23,12 +23,12 @@ namespace ParameciumTools
 		public static List<T> Substitute<T>(this List<T> list, T toReplace, T replacement)
 			where T : IEquatable<T>
 		{
-			List<T> NewIEnum = new List<T>(list.Count());
+			List<T> result = new List<T>(list.Count());
 			foreach (var item in list)
 			{
-				NewIEnum.Add(item.Equals(toReplace) ? replacement : item);
+				result.Add(item.Equals(toReplace) ? replacement : item);
 			}
-			return NewIEnum;
+			return result;
 		}
 
 		/// <summary>
@@ -41,12 +41,12 @@ namespace ParameciumTools
 		/// <returns></returns>
 		public static List<T> Substitute<T>(this List<T> list, IEnumerable<T> toReplace, T replacement)
 		{
-			List<T> NewIEnum = new List<T>(list.Count());
+			List<T> result = new List<T>(list.Count());
 			foreach (var item in list)
 			{
-				NewIEnum.Add(toReplace.Contains(item) ? replacement : item);
+				result.Add(toReplace.Contains(item) ? replacement : item);
 			}
-			return NewIEnum;
+			return result;
 		}
 
 		/// <summary>
@@ -58,12 +58,44 @@ namespace ParameciumTools
 		/// <returns></returns>
 		public static List<T> Substitute<T>(this List<T> list, Dictionary<T,T> substitutions)
 		{
-			List<T> NewIEnum = new List<T>(list.Count());
+			List<T> result = new List<T>(list.Count());
 			foreach (var item in list)
 			{
-				NewIEnum.Add(substitutions.ContainsKey(item) ? substitutions[item] : item);
+				result.Add(substitutions.ContainsKey(item) ? substitutions[item] : item);
 			}
-			return NewIEnum;
+			return result;
+		}
+
+		/// <summary>
+		/// Whenever pred1 is true for an item and pred2 is true for the next item, those two items are replaced with
+		/// the result of the merger when it is given them.
+		/// </summary>
+		/// <typeparam name="T">The type contained in the list.</typeparam>
+		/// <param name="pred1">The predicate for the first match.</param>
+		/// <param name="pred2">The predicate for the second match.</param>
+		/// <param name="merger">The function that takes in two matching items and returns a new item.</param>
+		/// <returns></returns>
+		public static List<T> Substitute<T>(this List<T> list, Predicate<T> pred1, Predicate<T> pred2, Func<T,T,T> merger)
+		{
+			int count = list.Count;
+			List<T> result = new List<T>(count);
+			// Set the max index at 2 less than the number of elements in list so it doesn't exceed the bounds when
+			// checking the (i+1)th element
+			int i = 0;
+			while (i < count -1)
+			{
+				if(pred1(list[i]) && pred2(list[i+1]))
+				{
+					result.Add(merger(list[i], list[i + 1]));
+					i += 2;
+				}
+				else
+				{
+					result.Add(list[i]);
+					i++;
+				}
+			}
+			return result;
 		}
 
 	}
