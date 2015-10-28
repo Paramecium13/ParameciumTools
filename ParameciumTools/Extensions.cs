@@ -98,5 +98,29 @@ namespace ParameciumTools
 			return result;
 		}
 
+		/// <summary>
+		/// Goes through a list and splits items for which the predicate is true into two items, which are given by
+		/// the splitter function.
+		/// </summary>
+		/// <typeparam name="T">The type of the items in the list.</typeparam>
+		/// <param name="list">The list.</param>
+		/// <param name="pred">The predicate.</param>
+		/// <param name="splitter">Splits one valid instance of T into two instances of T.</param>
+		/// <returns>A new List with the split items.</returns>
+		public static List<T> SubSplit<T>(this List<T> list, Predicate<T> pred, Func<T,Tuple<T,T>> splitter)
+		{
+			List<T> result = new List<T>(list.Count());
+			foreach (T item in list)
+			{
+				if (pred(item))
+				{
+					Tuple<T, T> split = splitter(item);
+					result.Add(split.Item1);
+					result.Add(split.Item2);
+				}
+			}
+			return result;
+		}
+
 	}
 }
