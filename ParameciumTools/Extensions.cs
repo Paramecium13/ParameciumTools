@@ -15,7 +15,7 @@ namespace ParameciumTools
 		/// <summary>
 		/// Substitutes all instances of one element with another element.
 		/// </summary>
-		/// <typeparam name="T">The type of the list, must implement IEquatable T </typeparam>
+		/// <typeparam name="T">The type of the list, must implement IEquatable T .</typeparam>
 		/// <param name="list">The list.</param>
 		/// <param name="toReplace">The element to replace.</param>
 		/// <param name="replacement">The element to replace with.</param>
@@ -23,30 +23,103 @@ namespace ParameciumTools
 		public static List<T> Substitute<T>(this List<T> list, T toReplace, T replacement)
 			where T : IEquatable<T>
 		{
-			List<T> NewIEnum = new List<T>(list.Count());
+			List<T> result = new List<T>(list.Count());
 			foreach (var item in list)
 			{
-				NewIEnum.Add(item.Equals(toReplace) ? replacement : item);
+				result.Add(item.Equals(toReplace) ? replacement : item);
 			}
-			return NewIEnum;
+			return result;
 		}
 
 		/// <summary>
-		/// 
+		/// Substitutes all items in 'toReplace' with 'replacement'.
 		/// </summary>
-		/// <typeparam name="T">The type of the list, must implement IEquatable T </typeparam>
+		/// <typeparam name="T">The type of the list's elements.</typeparam>
 		/// <param name="list">The list.</param>
 		/// <param name="toReplace">A collection of the elements to replace.</param>
 		/// <param name="replacement">The element to replace with.</param>
 		/// <returns></returns>
-		public static List<T> SubstituteAll<T>(this List<T> list, IEnumerable<T> toReplace, T replacement)
+		public static List<T> Substitute<T>(this List<T> list, IEnumerable<T> toReplace, T replacement)
 		{
-			List<T> NewIEnum = new List<T>(list.Count());
+			List<T> result = new List<T>(list.Count());
 			foreach (var item in list)
 			{
-				NewIEnum.Add(toReplace.Contains(item) ? replacement : item);
+				result.Add(toReplace.Contains(item) ? replacement : item);
 			}
-			return NewIEnum;
+			return result;
+		}
+
+		/// <summary>
+		/// Replaces all instances of the keys in the provided list with their associated values.
+		/// </summary>
+		/// <typeparam name="T">The type of the list's elements.</typeparam>
+		/// <param name="list">The list.</param>
+		/// <param name="substitutions">The dictionary of substitutions.</param>
+		/// <returns></returns>
+		public static List<T> Substitute<T>(this List<T> list, Dictionary<T,T> substitutions)
+		{
+			List<T> result = new List<T>(list.Count());
+			foreach (var item in list)
+			{
+				result.Add(substitutions.ContainsKey(item) ? substitutions[item] : item);
+			}
+			return result;
+		}
+
+		/// <summary>
+		/// Whenever pred1 is true for an item and pred2 is true for the next item, those two items are replaced with
+		/// the result of the merger when it is given them.
+		/// </summary>
+		/// <typeparam name="T">The type contained in the list.</typeparam>
+		/// <param name="pred1">The predicate for the first match.</param>
+		/// <param name="pred2">The predicate for the second match.</param>
+		/// <param name="merger">The function that takes in two matching items and returns a new item.</param>
+		/// <returns></returns>
+		public static List<T> Substitute<T>(this List<T> list, Predicate<T> pred1, Predicate<T> pred2, Func<T,T,T> merger)
+		{
+			int count = list.Count;
+			List<T> result = new List<T>(count);
+			// Set the max index at 2 less than the number of elements in list so it doesn't exceed the bounds when
+			// checking the (i+1)th element
+			int i = 0;
+			while (i < count -1)
+			{
+				if(pred1(list[i]) && pred2(list[i+1]))
+				{
+					result.Add(merger(list[i], list[i + 1]));
+					i += 2;
+				}
+				else
+				{
+					result.Add(list[i]);
+					i++;
+				}
+			}
+			return result;
+		}
+
+		/// <summary>
+		/// Goes through a list and splits items for which the predicate is true into two items, which are given by
+		/// the splitter function.
+		/// </summary>
+		/// <typeparam name="T">The type of the items in the list.</typeparam>
+		/// <param name="list">The list.</param>
+		/// <param name="pred">The predicate.</param>
+		/// <param name="splitter">Splits one valid instance of T into two instances of T.</param>
+		/// <returns>A new List with the split items.</returns>
+		public static List<T> SubSplit<T>(this List<T> list, Predicate<T> pred, Func<T,Tuple<T,T>> splitter)
+		{
+			List<T> result = new List<T>(list.Count());
+			foreach (T item in list)
+			{
+				if (pred(item))
+				{
+					Tuple<T, T> split = splitter(item);
+					result.Add(split.Item1);
+					result.Add(split.Item2);
+				}
+			}
+			return result;
 		}
 
 	}
